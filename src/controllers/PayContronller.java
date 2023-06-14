@@ -32,6 +32,7 @@ public class PayContronller {
     private TableView<Table> tbv;
 
     private ObservableList<Table> invoiceList;
+    private String lastPayValue = "";
 
     public void setInvoiceList(ObservableList<Table> invoiceList) {
         this.invoiceList = invoiceList;
@@ -53,7 +54,7 @@ public class PayContronller {
 
     }
 
-    public void btnDelete(MouseEvent mouseEvent) {
+    public void btnDeletes(MouseEvent mouseEvent) {
         if(txtpay!=null){
             txtpay.setText("");
         }
@@ -122,7 +123,6 @@ public class PayContronller {
 
                         // Lưu giá trị của txtpay vào biến tạm khi hoàn tất giao dịch
                         previousPayValue = txtpay.getText();
-                        Back(mouseEvent);
                     }
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
@@ -139,15 +139,12 @@ public class PayContronller {
     }
 
     public void Number(ActionEvent ae) {
+        String no = ((Button) ae.getSource()).getText();
+        txtpay.appendText(no);
+    }
 
-            String no= ((Button)ae.getSource()).getText();
-            txtpay.setText(txtpay.getText()+no);
-        }
 
     public void complete(ActionEvent actionEvent) {
-        txtpay.textProperty().addListener((observable, oldValue, newValue) -> {
-            previousPayValue = newValue;
-        });
         if (txtpay != null && txttotal != null) {
             String payText = txtpay.getText().replaceAll("[^\\d.]", "");
             String totalText = txttotal.getText().replaceAll("[^\\d.,]", "").replace(',', '.');
@@ -157,13 +154,13 @@ public class PayContronller {
                 double totalAmount = Double.parseDouble(totalText);
                 double changeAmount = payAmount - totalAmount;
 
-                txtchange.setText(String.format("%.2f", changeAmount)+"$");
+                txtchange.setText(String.format("%.2f", changeAmount) + "$");
 
-                // Không cần lưu giá trị của txtpay vào biến tạm nữa
+                // Lưu giá trị của txtpay vào biến lastPayValue khi hoàn tất giao dịch
+                lastPayValue = txtpay.getText();
 
-                // Lưu giá trị của txtpay vào biến tạm khi hoàn tất giao dịch
-                previousPayValue = txtpay.getText();
-                Back(null);
+                // Cập nhật giá trị của txtpay
+                txtpay.setText(lastPayValue);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -174,36 +171,27 @@ public class PayContronller {
     public void Vis(ActionEvent actionEvent) {
 
         btnVis.setStyle("-fx-background-color: yellow; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
-        btnVnpay.setStyle("-fx-background-color: ; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
+        btnVnpay.setStyle("-fx-background-color: white; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
 
 
     }
 
     public void Vnpay(ActionEvent actionEvent) {
         btnVnpay.setStyle("-fx-background-color: yellow; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
-        btnVis.setStyle("-fx-background-color: ; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
+        btnVis.setStyle("-fx-background-color:white ; -fx-border-color: #D3D3D3; -fx-border-radius: 6px;");
     }
 
 
     public void Back(MouseEvent mouseEvent) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/home.fxml"));
-            Parent root = loader.load();
-            HomeController homeController = loader.getController();
-            DataController.setInvoiceList(invoiceList);
 
-            // Tạo một Scene mới và lấy Stage từ MouseEvent
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
 
-            // Thiết lập Scene mới cho Stage
-            stage.setScene(scene);
-            stage.show();
+    }
 
-            // Làm mới dữ liệu trong HomeController
-            homeController.refreshTable();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void btnDelete(MouseEvent mouseEvent) {
+        String currentText = txtpay.getText();
+        if (!currentText.isEmpty()) {
+            txtpay.setText(currentText.substring(0, currentText.length() - 1));
+            lastPayValue = txtpay.getText(); // Cập nhật giá trị của lastPayValue
         }
     }
 }
