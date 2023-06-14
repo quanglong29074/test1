@@ -46,15 +46,6 @@ public class PayContronller {
 
 
 
-
-    public void change(){
-        if(txtpay!=null&&txttotal!=null){
-
-
-        }
-    }
-
-
     public void btnMoney1(MouseEvent mouseEvent) {
 
         txtpay.setText("1$");
